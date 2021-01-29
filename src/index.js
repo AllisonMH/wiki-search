@@ -1,17 +1,40 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import './styles.css';
+import axios from 'axios';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+function App () {
+  const [pages, setPages] = useState([]);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  const fetchData = async() => {
+    const response = await axios.get('https://en.wikipedia.org/w/rest.php/v1/search/title?q=Foo&limit=10');
+    setPages(response.data.pages);
+  };
+  console.log("Pages ", pages);
+
+  return (
+    <div className='App'>
+      <h1> Wiki Search Results </h1>
+      <div>
+        <button className='fetch-button' onClick={fetchData}> Fetch Data </button>
+        <br />
+      </div>
+      <div className='pages'>
+        {pages &&
+          pages.map((page, index) => {
+            return (
+              <div className='page' key={index}>
+                <h2> {page.title}</h2>
+                <div className='details'>
+                  <p>Description: {page.description} </p>
+                  <p>Excerpt: {page.excerpt} </p>
+                </div>
+              </div>
+            )
+        })}
+      </div>
+    </div>
+  )
+}
+const rootElement = document.getElementById('root');
+ReactDOM.render(<App />, rootElement);
